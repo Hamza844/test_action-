@@ -1,0 +1,39 @@
+name: Build and Test Webpage
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository code
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # Step 2: Set up a basic web server for testing
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      # Step 3: Install a simple static server (http-server)
+      - name: Install http-server
+        run: |
+          npm install -g http-server
+
+      # Step 4: Start the server to host the static webpage
+      - name: Serve the Webpage
+        run: |
+          http-server -c-1 ./ -p 8080 &
+
+      # Step 5: Test if the webpage is accessible
+      - name: Test Webpage
+        run: |
+          curl -I http://localhost:8080/index.html
