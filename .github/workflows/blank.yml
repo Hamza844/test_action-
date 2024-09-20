@@ -1,36 +1,39 @@
-# This is a basic workflow to help you get started with Actions
+name: Build and Test Webpage
 
-name: CI
-
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
-    branches: [ "main" ]
+    branches:
+      - main
   pull_request:
-    branches: [ "main" ]
+    branches:
+      - main
 
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
   build:
-    # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4
+      # Step 1: Checkout the repository code
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-      # Runs a single command using the runner's shell
-      - name: Run a one-line script
-        run: echo Hello, world!
+      # Step 2: Set up a basic web server for testing
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
 
-      # Runs a set of commands using the runner's shell
-      - name: Run a multi-line script
+      # Step 3: Install a simple static server (http-server)
+      - name: Install http-server
         run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+          npm install -g http-server
+
+      # Step 4: Start the server to host the static webpage
+      - name: Serve the Webpage
+        run: |
+          http-server -c-1 ./ -p 8080 &
+
+      # Step 5: Test if the webpage is accessible
+      - name: Test Webpage
+        run: |
+          curl -I http://localhost:8080/index.html
